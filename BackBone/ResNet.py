@@ -59,7 +59,7 @@ def resnet_block(input_channels, num_channels, num_residuals, first_block=False)
     return blk
 
 
-def net():
+def ResNet():
     '''
     default net is 18 layers
     '''
@@ -82,8 +82,12 @@ def net():
 
 if __name__ == "__main__":
     # test net
-    X = torch.rand(size=(1, 1, 224, 224))
-    resnet18 = net()
-    for layer in resnet18:
-        X = layer(X)
-        print(layer.__class__.__name__, 'output shape:\t', X.shape)
+    X = torch.rand(size=(5, 1, 224, 224))
+    resnet18 = ResNet()
+    # for layer in resnet18:
+    #     X = layer(X)
+    #     print(layer.__class__.__name__, 'output size():\t', X.size())
+
+    print(X.size())
+    X = resnet18(X)
+    print(X.size())

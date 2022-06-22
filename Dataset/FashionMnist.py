@@ -16,7 +16,9 @@ class FMnist(dataset.Dataset):
             return
 
         index = key % self.len
-        return self.images[index], self.labels[index] 
+        img = self.images[index].reshape((1, 28, 28))
+        label = self.labels[index]
+        return img, label
 
     def __len__(self):
         return self.len
