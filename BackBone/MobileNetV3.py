@@ -91,13 +91,9 @@ class BNeck(nn.Module):
         self.bn3 = nn.BatchNorm2d(out_c)
 
         # link
-        self.conv4 = None
-        self.bn4 = None
-        self.act4 = None
+        self.use_res_connect = False
         if stride == 1 and in_c == out_c:
-            self.conv4 = nn.Conv2d(in_channels=in_c, out_channels=out_c, kernel_size=1, stride=1)
-            self.bn4 = nn.BatchNorm2d(out_c)
-            self.act4 = nn.ReLU(inplace=True)
+            self.use_res_connect = True
 
     def forward(self, x):
         y = self.act1(self.bn1(self.conv1(x)))
@@ -106,8 +102,7 @@ class BNeck(nn.Module):
             y = self.se(y)
         y = self.bn3(self.conv3(y))
 
-        if self.conv4:
-            x = self.act4(self.bn4(self.conv4(x)))
+        if self.use_res_connect:
             y = y + x
 
         return y
@@ -116,7 +111,7 @@ class MobileNetV3(nn.Module):
     def __init__(self, num_class):
         super(MobileNetV3, self).__init__()
         self.net = nn.Sequential(
-            ConvBN(3, 16, k=3, stride=2, use_bn=True, act_type="HS"),
+            ConvBN(1, 16, k=3, stride=2, use_bn=True, act_type="HS"),
             BNeck(in_c=16, exp_size=16, out_c=16, k=3, stride=1, use_se=False, act_type="RE"),
             BNeck(in_c=16, exp_size=64, out_c=24, k=3, stride=2, use_se=False, act_type="RE"),
             BNeck(in_c=24, exp_size=72, out_c=24, k=3, stride=1, use_se=False, act_type="RE"),
@@ -136,7 +131,8 @@ class MobileNetV3(nn.Module):
             nn.AdaptiveAvgPool2d(1),
             nn.Conv2d(in_channels=960, out_channels=1280, kernel_size=1, stride=1, padding=0),
             HSigmoid(),
-            nn.Conv2d(in_channels=1280, out_channels=num_class, kernel_size=1, stride=1, padding=0)
+            nn.Conv2d(in_channels=1280, out_channels=num_class, kernel_size=1, stride=1, padding=0),
+            nn.Flatten()
         )
 
     def forward(self, x):
@@ -146,7 +142,7 @@ class MobileNetV3(nn.Module):
 if __name__ == "__main__":
     num_class = 10
     mobile_net_v3 = MobileNetV3(num_class)
-    x = torch.rand((5, 3, 224, 224))
+    x = torch.rand((5, 1, 224, 224))
 
     print("fake input:", x.size())
     for layer in mobile_net_v3.net:

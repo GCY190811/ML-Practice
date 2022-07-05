@@ -66,7 +66,7 @@ def MobileNet():
 
 if __name__ == "__main__":
     net = MobileNet()
-    X = torch.rand((1, 3, 224, 224))
+    X = torch.rand((1, 1, 224, 224))
 
     print('fake input:', X.shape)
     for layer in net:

@@ -3,6 +3,7 @@ sys.path.append(os.path.dirname(__file__) + os.sep + '../')
 
 from BackBone.ResNet import ResNet
 from BackBone.MobileNet import MobileNet
+from BackBone.MobileNetV3 import MobileNetV3
 from Dataset.FashionMnist import FMnist
 
 import torch
@@ -19,7 +20,8 @@ if __name__ == "__main__":
     # loss and optimizer
     device = torch.device('cuda:0')
     # model = ResNet().to(device)
-    model = MobileNet().to(device)
+    # model = MobileNet().to(device)
+    model = MobileNetV3(num_class=10).to(device)
     cost = torch.nn.CrossEntropyLoss()
     optimizer = torch.optim.Adam(model.parameters())
 
